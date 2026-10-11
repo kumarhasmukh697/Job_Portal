@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>Find your dream job today</h1>
+    <p>Search thousands of openings from top companies. Apply in minutes and take the next step in your career.</p>
+
+    <form class="search-box" action="{% url 'jobs:job_list' %}" method="get" role="search">
+      <input type="text" name="q" class="input" placeholder="Job title or keyword" aria-label="Search keywords">
+      <select name="location" class="select" aria-label="Location">
+        <option value="">All locations</option>
+        <option value="remote">Remote</option>
+        <option value="New York">New York</option>
+        <option value="San Francisco">San Francisco</option>
+        <option value="London">London</option>
+        <option value="Bangalore">Bangalore</option>
+      </select>
+      <select name="category" class="select" aria-label="Category">
+        <option value="">All categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat.slug }}">{{ cat.name }}</option>
+        {% empty %}
+        <option value="engineering">Engineering</option>
+        <option value="design">Design</option>
+        <option value="marketing">Marketing</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="btn btn-primary btn-lg">Search Jobs</button>
+    </form>
+  </div>
+</section>
+
+<section class="container py-12">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="section-title" style="margin-bottom:0;">Featured Jobs</h2>
+    <a href="{% url 'jobs:job_list' %}" class="btn btn-outline btn-sm">View all</a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for job in featured_jobs %}
+    <article class="card job-card">
+      <div class="card-body">
+        <div class="flex gap-4 mb-4">
+          <div class="company-logo">{{ job.company_initials }}</div>
+          <div style="min-width:0;">
+            <h3 class="font-semibold truncate">
+              <a href="{{ job.get_absolute_url }}">{{ job.title }}</a>
+            </h3>
+            <p class="text-sm text-muted">{{ job.company }}</p>
+          </div>
+        </div>
+        <div class="job-meta mb-4">
+          <span>
+            <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            {% if job.is_remote %}Remote{% else %}{{ job.location }}{% endif %}
+          </span>
+          <span>{{ job.salary_display }}</span>
+          <span>{{ job.get_job_type_display }}</span>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          {% for tag in job.tag_list|slice:":3" %}
+          <span class="badge badge-secondary">{{ tag }}</span>
+          {% endfor %}
+          {% if job.category %}
+          <span class="badge badge-outline">{{ job.category.name }}</span>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-footer flex justify-between items-center">
+        <span class="text-xs text-muted">{{ job.created_at|timesince }} ago</span>
+        <a href="{{ job.get_absolute_url }}" class="btn btn-primary btn-sm">View Job</a>
+      </div>
+    </article>
+    {% empty %}
+    <div class="empty-state" style="grid-column: 1 / -1;">
+      <h3>No jobs yet</h3>
+      <p>Be the first to post a job opening.</p>
+      <a href="{% url 'jobs:job_post' %}" class="btn btn-primary">Post a Job</a>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container py-12">
+  <div class="card" style="background: var(--muted); border: none;">
+    <div class="card-body text-center py-12">
+      <h2 class="text-2xl font-bold mb-2">Hiring? Reach top talent</h2>
+      <p class="text-muted mb-6" style="max-width: 28rem; margin-left: auto; margin-right: auto;">
+        Post your opening in minutes and get applications from qualified candidates.
+      </p>
+      <a href="{% url 'jobs:job_post' %}" class="btn btn-primary btn-lg">Post a Job</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

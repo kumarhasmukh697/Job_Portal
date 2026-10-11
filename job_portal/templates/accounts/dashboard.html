@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <p>Welcome back, {{ user.get_full_name|default:user.username }}. Here’s an overview of your activity.</p>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 stat-grid">
+    <div class="stat-card">
+      <div class="stat-value">{{ app_count }}</div>
+      <div class="stat-label">Applications sent</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ pending_count }}</div>
+      <div class="stat-label">In review</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ interview_count }}</div>
+      <div class="stat-label">Interviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">{{ saved_count }}</div>
+      <div class="stat-label">Saved jobs</div>
+    </div>
+  </div>
+
+  <div data-tabs>
+    <div class="tabs">
+      <button type="button" class="tab-btn active" data-tab="applications">My Applications</button>
+      <button type="button" class="tab-btn" data-tab="saved">Saved Jobs</button>
+      {% if user.is_employer %}
+      <button type="button" class="tab-btn" data-tab="employer">Employer view</button>
+      {% endif %}
+    </div>
+
+    <div id="applications" class="tab-panel active">
+      {% if applications %}
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Job</th>
+              <th>Company</th>
+              <th>Applied</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in applications %}
+            <tr>
+              <td class="font-medium">{{ app.job.title }}</td>
+              <td>{{ app.job.company }}</td>
+              <td class="text-muted">{{ app.created_at|timesince }} ago</td>
+              <td>
+                {% if app.status == "pending" %}<span class="badge badge-warning">Pending</span>
+                {% elif app.status == "interview" %}<span class="badge badge-success">Interview</span>
+                {% elif app.status == "shortlisted" %}<span class="badge badge-success">Shortlisted</span>
+                {% else %}<span class="badge badge-secondary">{{ app.get_status_display }}</span>{% endif %}
+              </td>
+              <td><a href="{{ app.job.get_absolute_url }}" class="btn btn-ghost btn-sm">View</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h3>No applications yet</h3>
+        <p>Browse jobs and apply to get started.</p>
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-primary">Find Jobs</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <div id="saved" class="tab-panel">
+      {% if saved_jobs %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for saved in saved_jobs %}
+        <article class="card job-card">
+          <div class="card-body">
+            <div class="flex gap-4">
+              <div class="company-logo">{{ saved.job.company_initials }}</div>
+              <div>
+                <h3 class="font-semibold"><a href="{{ saved.job.get_absolute_url }}">{{ saved.job.title }}</a></h3>
+                <p class="text-sm text-muted">{{ saved.job.company }} · {% if saved.job.is_remote %}Remote{% else %}{{ saved.job.location }}{% endif %}</p>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer flex justify-between">
+            <span class="text-xs text-muted">Saved {{ saved.created_at|timesince }} ago</span>
+            <a href="{{ saved.job.get_absolute_url }}" class="btn btn-primary btn-sm">View</a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <h3>No saved jobs</h3>
+        <p>Save jobs you’re interested in for later.</p>
+        <a href="{% url 'jobs:job_list' %}" class="btn btn-outline">Browse jobs</a>
+      </div>
+      {% endif %}
+    </div>
+
+    {% if user.is_employer %}
+    <div id="employer" class="tab-panel">
+      <div class="flex items-center justify-between mb-4">
+        <p class="text-muted text-sm">Quick overview of your listings</p>
+        <a href="{% url 'jobs:my_jobs' %}" class="btn btn-outline btn-sm">Manage all</a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="stat-card">
+          <div class="stat-value">{{ active_listings|default:0 }}</div>
+          <div class="stat-label">Active listings</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ total_applications|default:0 }}</div>
+          <div class="stat-label">Total applications</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ my_jobs|length|default:0 }}</div>
+          <div class="stat-label">All listings</div>
+        </div>
+      </div>
+      <a href="{% url 'jobs:job_post' %}" class="btn btn-primary">Post a new job</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div style="grid-column: span 2;">
+      <div class="mb-6">
+        <a href="{% url 'jobs:job_list' %}" class="text-sm text-muted" style="display:inline-flex;align-items:center;gap:0.25rem;">
+          <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          Back to jobs
+        </a>
+      </div>
+
+      <div class="flex gap-4 items-start mb-6">
+        <div class="company-logo" style="width:4rem;height:4rem;font-size:1.25rem;">{{ job.company_initials }}</div>
+        <div>
+          <h1 class="text-2xl font-bold mb-1">{{ job.title }}</h1>
+          <p class="text-muted">{{ job.company }}{% if job.category %} · {{ job.category.name }}{% endif %}</p>
+        </div>
+      </div>
+
+      <div class="job-meta mb-6">
+        <span>{% if job.is_remote %}Remote{% else %}{{ job.location }}{% endif %}</span>
+        <span>{{ job.salary_display }}</span>
+        <span>{{ job.get_job_type_display }}</span>
+        <span class="badge badge-outline">Posted {{ job.created_at|timesince }} ago</span>
+      </div>
+
+      {% if job.tag_list %}
+      <div class="flex gap-2 flex-wrap mb-8">
+        {% for tag in job.tag_list %}
+        <span class="badge badge-secondary">{{ tag }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold mb-3">About the role</h2>
+        <div class="text-muted" style="white-space: pre-line;">{{ job.description }}</div>
+      </section>
+
+      {% if job.requirements %}
+      <section class="mb-8">
+        <h2 class="text-lg font-semibold mb-3">Requirements</h2>
+        <div class="text-muted" style="white-space: pre-line;">{{ job.requirements }}</div>
+      </section>
+      {% endif %}
+
+      {% if job.benefits %}
+      <section>
+        <h2 class="text-lg font-semibold mb-3">Benefits</h2>
+        <div class="text-muted" style="white-space: pre-line;">{{ job.benefits }}</div>
+      </section>
+      {% endif %}
+    </div>
+
+    <aside>
+      <div class="card" style="position:sticky;top:5rem;">
+        <div class="card-body">
+          {% if user.is_authenticated %}
+            {% if already_applied %}
+              <button type="button" class="btn btn-secondary w-full mb-3" disabled>Already applied</button>
+            {% else %}
+              <button type="button" class="btn btn-primary w-full mb-3" data-modal-target="#apply-modal">Apply now</button>
+            {% endif %}
+            <a href="{% url 'jobs:save_job' job.slug %}" class="btn btn-outline w-full mb-6">Save job</a>
+          {% else %}
+            <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-primary w-full mb-3">Log in to apply</a>
+          {% endif %}
+
+          <div class="mb-4">
+            <p class="text-xs text-muted mb-1">Company</p>
+            <p class="font-medium">{{ job.company }}</p>
+          </div>
+          <div class="mb-4">
+            <p class="text-xs text-muted mb-1">Location</p>
+            <p class="font-medium">{% if job.is_remote %}Remote{% else %}{{ job.location }}{% endif %}</p>
+          </div>
+          <div class="mb-4">
+            <p class="text-xs text-muted mb-1">Employment type</p>
+            <p class="font-medium">{{ job.get_job_type_display }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-muted mb-1">Salary</p>
+            <p class="font-medium">{{ job.salary_display }}</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+{% if user.is_authenticated and not already_applied %}
+<div class="modal-overlay" id="apply-modal" role="dialog" aria-modal="true" aria-labelledby="apply-modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="apply-modal-title">Apply – {{ job.title }}</h2>
+      <button type="button" class="modal-close" data-modal-close aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="modal-body">
+        {% for field in form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}</label>
+          {{ field }}
+          {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Submit Application</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

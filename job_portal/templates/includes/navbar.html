@@ -1,0 +1,53 @@
+<header class="navbar">
+  <div class="container navbar-inner">
+    <a href="{% url 'jobs:home' %}" class="navbar-brand">
+      <span class="logo-icon">JP</span>
+      <span>JobPortal</span>
+    </a>
+
+    <nav class="navbar-nav" aria-label="Main">
+      <a href="{% url 'jobs:home' %}" class="nav-link">Home</a>
+      <a href="{% url 'jobs:job_list' %}" class="nav-link">Find Jobs</a>
+      {% if user.is_authenticated and user.is_employer %}
+      <a href="{% url 'jobs:job_post' %}" class="nav-link">Post a Job</a>
+      <a href="{% url 'jobs:my_jobs' %}" class="nav-link">My Listings</a>
+      {% endif %}
+      {% if user.is_authenticated %}
+      <a href="{% url 'accounts:dashboard' %}" class="nav-link">Dashboard</a>
+      {% endif %}
+    </nav>
+
+    <div class="navbar-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'accounts:profile' %}" class="btn btn-ghost btn-sm">{{ user.get_full_name|default:user.username }}</a>
+        <a href="{% url 'accounts:logout' %}" class="btn btn-outline btn-sm">Log out</a>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-ghost btn-sm">Log in</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Sign up</a>
+      {% endif %}
+
+      <button type="button" class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="{% url 'jobs:home' %}" class="nav-link">Home</a>
+    <a href="{% url 'jobs:job_list' %}" class="nav-link">Find Jobs</a>
+    {% if user.is_authenticated and user.is_employer %}
+    <a href="{% url 'jobs:job_post' %}" class="nav-link">Post a Job</a>
+    <a href="{% url 'jobs:my_jobs' %}" class="nav-link">My Listings</a>
+    {% endif %}
+    {% if user.is_authenticated %}
+    <a href="{% url 'accounts:dashboard' %}" class="nav-link">Dashboard</a>
+    <a href="{% url 'accounts:profile' %}" class="nav-link">Profile</a>
+    <a href="{% url 'accounts:logout' %}" class="nav-link">Log out</a>
+    {% else %}
+    <a href="{% url 'accounts:login' %}" class="nav-link">Log in</a>
+    <a href="{% url 'accounts:register' %}" class="nav-link">Sign up</a>
+    {% endif %}
+  </div>
+</header>

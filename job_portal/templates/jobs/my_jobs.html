@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}My Job Listings{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  <div class="page-header flex items-center justify-between flex-wrap gap-4">
+    <div>
+      <h1>My Job Listings</h1>
+      <p>Manage the jobs you’ve posted.</p>
+    </div>
+    <a href="{% url 'jobs:job_post' %}" class="btn btn-primary">Post new job</a>
+  </div>
+
+  {% if jobs %}
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Applications</th>
+          <th>Posted</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td><a href="{{ job.get_absolute_url }}" class="font-medium">{{ job.title }}</a></td>
+          <td>{% if job.is_remote %}Remote{% else %}{{ job.location }}{% endif %}</td>
+          <td>
+            {% if job.status == "active" %}
+            <span class="badge badge-success">Active</span>
+            {% elif job.status == "closed" %}
+            <span class="badge badge-secondary">Closed</span>
+            {% else %}
+            <span class="badge badge-outline">Draft</span>
+            {% endif %}
+          </td>
+          <td><a href="{% url 'jobs:applications' job.slug %}">{{ job.applications.count }}</a></td>
+          <td class="text-muted">{{ job.created_at|timesince }} ago</td>
+          <td>
+            <div class="flex gap-2">
+              <a href="{% url 'jobs:job_edit' job.slug %}" class="btn btn-ghost btn-sm">Edit</a>
+              <form method="post" action="{% url 'jobs:job_delete' job.slug %}" style="display:inline;" onsubmit="return confirm('Delete this job listing?');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-ghost btn-sm text-destructive">Delete</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h3>No listings yet</h3>
+    <p>Post your first job to start receiving applications.</p>
+    <a href="{% url 'jobs:job_post' %}" class="btn btn-primary">Post a Job</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

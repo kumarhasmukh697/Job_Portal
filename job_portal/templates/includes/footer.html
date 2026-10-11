@@ -1,0 +1,34 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">JobPortal</div>
+        <p class="footer-desc">Connecting talented people with great companies. Find your next opportunity or hire your next star.</p>
+      </div>
+      <div>
+        <h4 class="footer-title">For Job Seekers</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'jobs:job_list' %}">Browse Jobs</a></li>
+          <li><a href="{% url 'accounts:register' %}">Create Account</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-title">For Employers</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'jobs:job_post' %}">Post a Job</a></li>
+          <li><a href="{% url 'accounts:register' %}">Employer Signup</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="footer-title">Company</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'jobs:home' %}">Home</a></li>
+          <li><a href="{% url 'accounts:login' %}">Log in</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 JobPortal. All rights reserved.
+    </div>
+  </div>
+</footer>

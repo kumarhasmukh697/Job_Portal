@@ -1,0 +1,5 @@
+Django>=5.0,<6.0
+psycopg2-binary>=2.9  # for PostgreSQL (optional in dev)
+Pillow>=10.0          # if handling image uploads
+python-dotenv>=1.0    # optional env management
+requests>=2.31        # for external job API integration

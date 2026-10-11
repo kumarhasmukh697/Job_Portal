@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  <div class="page-header">
+    <h1>Your Profile</h1>
+    <p>Manage your personal information and preferences.</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="company-logo" style="width:5rem;height:5rem;font-size:1.5rem;margin:0 auto 1rem;">
+          {{ user.first_name|default:user.username|slice:":2"|upper }}
+        </div>
+        <h2 class="font-semibold text-lg">{{ user.get_full_name|default:user.username }}</h2>
+        <p class="text-sm text-muted mb-4">{{ user.get_role_display }}</p>
+      </div>
+    </div>
+
+    <div style="grid-column: span 2;">
+      <div class="card mb-6">
+        <div class="card-header">
+          <h3 class="card-title">Personal details</h3>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

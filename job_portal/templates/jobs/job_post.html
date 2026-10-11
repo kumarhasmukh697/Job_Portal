@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{% if editing %}Edit Job{% else %}Post a Job{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container py-8">
+  <div class="page-header">
+    <h1>{% if editing %}Edit Job{% else %}Post a Job{% endif %}</h1>
+    <p>{% if editing %}Update your listing details.{% else %}Fill in the details below. Your listing will be visible to job seekers after you publish.{% endif %}</p>
+  </div>
+
+  <div class="card" style="max-width: 42rem;">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+          <label class="form-label" for="{{ field.id_for_label }}">
+            {{ field.label }}{% if field.field.required %} <span class="required">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}<p class="form-hint">{{ field.help_text }}</p>{% endif %}
+          {% if field.errors %}<p class="form-error">{{ field.errors.0 }}</p>{% endif %}
+        </div>
+        {% endfor %}
+        <div class="flex gap-3 mt-6">
+          <button type="submit" class="btn btn-primary">{% if editing %}Save changes{% else %}Publish Job{% endif %}</button>
+          <a href="{% url 'jobs:my_jobs' %}" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
